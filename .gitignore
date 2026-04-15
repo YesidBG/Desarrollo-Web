@@ -1,0 +1,19 @@
+# Dependencias y paquetes
+vendor/
+node_modules/
+
+# Archivos de configuración locales (con contraseñas)
+*.env
+.env
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# IDEs
+.idea/
+.vscode/
+*.swp

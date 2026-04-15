@@ -1,0 +1,9 @@
+Options -Indexes
+
+RewriteEngine On
+
+# Las peticiones a /public/ pasan directas (CSS, JS, index.php)
+RewriteRule ^public/ - [L]
+
+# Todo lo demás se redirige a public/index.php
+RewriteRule ^ public/index.php [L]
