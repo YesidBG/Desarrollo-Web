@@ -97,3 +97,27 @@ class DeleteDocenteCommand
         $this->id = $id;
     }
 }
+
+// ── Command: Login ────────────────────────────────────────────────────────
+class LoginCommand
+{
+    public $email;
+    public $password;
+
+    public function __construct(string $email, string $password)
+    {
+        $this->email    = $email;
+        $this->password = $password;
+    }
+}
+
+// ── Command: Recuperar contraseña ─────────────────────────────────────────
+class ForgotPasswordCommand
+{
+    public $email;
+
+    public function __construct(string $email)
+    {
+        $this->email = $email;
+    }
+}

@@ -35,3 +35,9 @@ interface DeleteDocentePort
 {
     public function delete(DocenteId $id): void;
 }
+
+// ── Puerto: actualizar contraseña ─────────────────────────────────────────
+interface UpdatePasswordPort
+{
+    public function updatePassword(DocenteId $id, string $hashedPassword): void;
+}

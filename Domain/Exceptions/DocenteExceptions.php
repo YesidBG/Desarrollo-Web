@@ -33,3 +33,18 @@ class DocenteEmailDuplicadoException extends \RuntimeException
         parent::__construct("Ya existe un docente registrado con el email '$email'.");
     }
 }
+class InvalidCredentialsException extends \RuntimeException
+{
+    public function __construct()
+    {
+        parent::__construct("Email o contraseña incorrectos.");
+    }
+}
+
+class DocenteInactivoException extends \RuntimeException
+{
+    public function __construct()
+    {
+        parent::__construct("Tu cuenta no tiene acceso al sistema.");
+    }
+}

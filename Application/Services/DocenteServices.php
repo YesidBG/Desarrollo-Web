@@ -162,3 +162,75 @@ class GetAllDocentesService implements GetAllDocentesUseCase
         return $this->allPort->findAll();
     }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LoginService
+// ─────────────────────────────────────────────────────────────────────────────
+class LoginService
+{
+    private $byEmailPort;
+
+    public function __construct(GetDocenteByEmailPort $byEmailPort)
+    {
+        $this->byEmailPort = $byEmailPort;
+    }
+
+    public function execute(\Application\Commands\LoginCommand $cmd): DocenteModel
+    {
+        $error = new \Domain\Exceptions\InvalidCredentialsException();
+
+        $email   = DocenteEmail::from($cmd->email);
+        $docente = $this->byEmailPort->findByEmail($email);
+
+        if ($docente === null) {
+            throw $error;
+        }
+
+        $password = \Domain\ValueObjects\DocentePassword::fromHash(
+            $docente->getPassword()
+        );
+
+        if (!$password->verifyPlain($cmd->password)) {
+            throw $error;
+        }
+
+        return $docente;
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ForgotPasswordService
+// ─────────────────────────────────────────────────────────────────────────────
+class ForgotPasswordService
+{
+    private $byEmailPort;
+    private $updatePasswordPort;
+
+    public function __construct(
+        GetDocenteByEmailPort                      $byEmailPort,
+        \Application\Ports\Out\UpdatePasswordPort  $updatePasswordPort
+    ) {
+        $this->byEmailPort        = $byEmailPort;
+        $this->updatePasswordPort = $updatePasswordPort;
+    }
+
+    // Retorna la nueva clave temporal en texto plano (para mostrar en pantalla)
+    public function execute(\Application\Commands\ForgotPasswordCommand $cmd): string
+    {
+        $email   = DocenteEmail::from($cmd->email);
+        $docente = $this->byEmailPort->findByEmail($email);
+
+        // Siempre mostramos éxito — evita enumeración de emails
+        if ($docente === null) {
+            return ''; // vacío = email no existe, pero no lo decimos
+        }
+
+        // Generar clave temporal legible: 8 caracteres alfanuméricos
+        $nuevaClave = substr(str_shuffle('abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789'), 0, 8);
+        $hash       = \Domain\ValueObjects\DocentePassword::fromPlainText($nuevaClave)->getHash();
+
+        $this->updatePasswordPort->updatePassword($docente->getId(), $hash);
+
+        return $nuevaClave;
+    }
+}

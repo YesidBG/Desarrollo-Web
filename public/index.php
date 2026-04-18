@@ -19,6 +19,7 @@ loadClass('Domain', 'ValueObjects', 'DocenteEmail');
 loadClass('Domain', 'ValueObjects', 'DocenteTelefono');
 loadClass('Domain', 'ValueObjects', 'DocenteBlog');
 loadClass('Domain', 'ValueObjects', 'DocenteAniosExperiencia');
+loadClass('Domain', 'ValueObjects', 'DocentePassword');
 loadClass('Domain', 'Models', 'DocenteModel');
 loadClass('Application', 'Ports', 'Out', 'DocentePorts');
 loadClass('Application', 'Ports', 'In', 'DocenteUseCases');
@@ -32,6 +33,7 @@ loadClass('Infrastructure', 'Entrypoints', 'Web', 'Controllers', 'Config', 'WebR
 loadClass('Infrastructure', 'Entrypoints', 'Web', 'Controllers', 'Dto', 'DocenteWebDtos');
 loadClass('Infrastructure', 'Entrypoints', 'Web', 'Controllers', 'Mapper', 'DocenteWebMapper');
 loadClass('Infrastructure', 'Entrypoints', 'Web', 'Controllers', 'DocenteController');
+loadClass('Infrastructure', 'Entrypoints', 'Web', 'Controllers', 'AuthController');
 
 use Infrastructure\Entrypoints\Web\Presentation\View;
 use Infrastructure\Entrypoints\Web\Presentation\Flash;
@@ -42,12 +44,16 @@ use Application\Services\UpdateDocenteService;
 use Application\Services\DeleteDocenteService;
 use Application\Services\GetDocenteByIdService;
 use Application\Services\GetAllDocentesService;
+use Application\Services\LoginService;
+use Application\Services\ForgotPasswordService;
 use Infrastructure\Entrypoints\Web\Controllers\Mapper\DocenteWebMapper;
 use Infrastructure\Entrypoints\Web\Controllers\DocenteController;
+use Infrastructure\Entrypoints\Web\Controllers\AuthController;
 use Infrastructure\Entrypoints\Web\Controllers\Config\WebRoutes;
 
 View::setBasePath(ROOT);
 
+// ── Base de datos ─────────────────────────────────────────────────────────
 try {
     $pdo = new PDO(
         'mysql:host=localhost;dbname=crud_docentes;charset=utf8mb4',
@@ -61,11 +67,10 @@ try {
     );
 } catch (PDOException $e) {
     die('<div style="font-family:monospace;color:red;padding:2rem;">
-         <b>Error de conexión:</b><br>'
-        . htmlspecialchars($e->getMessage())
-        . '</div>');
+         <b>Error BD:</b><br>' . htmlspecialchars($e->getMessage()) . '</div>');
 }
 
+// ── Dependencias ──────────────────────────────────────────────────────────
 $persistMapper = new DocentePersistenceMapper();
 $repository    = new DocenteRepositoryMySQL($pdo, $persistMapper);
 
@@ -74,20 +79,27 @@ $updateSvc  = new UpdateDocenteService($repository, $repository, $repository);
 $deleteSvc  = new DeleteDocenteService($repository, $repository);
 $getByIdSvc = new GetDocenteByIdService($repository);
 $getAllSvc   = new GetAllDocentesService($repository);
+$loginSvc   = new LoginService($repository);
+$forgotSvc  = new ForgotPasswordService($repository, $repository);
 
-$webMapper  = new DocenteWebMapper();
-$controller = new DocenteController(
-    $createSvc, $updateSvc, $deleteSvc,
-    $getByIdSvc, $getAllSvc,
-    $webMapper
-);
+$webMapper   = new DocenteWebMapper();
+$docenteCtrl = new DocenteController($createSvc, $updateSvc, $deleteSvc, $getByIdSvc, $getAllSvc, $webMapper);
+$authCtrl    = new AuthController($loginSvc, $forgotSvc);
 
-$routeName = $_GET['route'] ?? 'home';
+// ── Enrutamiento ──────────────────────────────────────────────────────────
+$routeName = $_GET['route'] ?? 'auth.login';
 $route     = WebRoutes::find($routeName);
 
 if ($route === null) {
     Flash::set('error', "Ruta no encontrada.");
-    View::redirect('home');
+    View::redirect('auth.login');
+    exit;
+}
+
+// ── Protección de sesión ──────────────────────────────────────────────────
+if (!WebRoutes::isPublic($routeName) && !isset($_SESSION['auth'])) {
+    Flash::set('error', 'Debes iniciar sesión para acceder.');
+    View::redirect('auth.login');
     exit;
 }
 
@@ -96,10 +108,17 @@ if (strtoupper($_SERVER['REQUEST_METHOD']) !== strtoupper($route['method'])) {
     die("Método HTTP no permitido.");
 }
 
+// ── Despacho ──────────────────────────────────────────────────────────────
 try {
     $action = $route['action'];
-    $controller->$action();
+    $ctrl   = $route['ctrl'];
+
+    if ($ctrl === 'auth') {
+        $authCtrl->$action();
+    } else {
+        $docenteCtrl->$action();
+    }
 } catch (\Throwable $e) {
     Flash::set('error', 'Error: ' . $e->getMessage());
-    View::redirect('home');
+    View::redirect('auth.login');
 }

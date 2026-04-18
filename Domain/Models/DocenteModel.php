@@ -24,6 +24,7 @@ class DocenteModel
     private $idioma;
     private $aniosExperiencia;
     private $areaTrabajo;
+    private $password;
 
     private function __construct(
         $id,
@@ -36,7 +37,8 @@ class DocenteModel
         EscalafonDocente        $escalafon,
         IdiomaDocente           $idioma,
         DocenteAniosExperiencia $aniosExperiencia,
-        string                  $areaTrabajo
+        string                  $areaTrabajo,
+        string                  $password = ''
     ) {
         $this->id               = $id;
         $this->nombre           = $nombre;
@@ -49,6 +51,7 @@ class DocenteModel
         $this->idioma           = $idioma;
         $this->aniosExperiencia = $aniosExperiencia;
         $this->areaTrabajo      = $areaTrabajo;
+        $this->password         = $password;
     }
 
     public static function create(
@@ -62,26 +65,28 @@ class DocenteModel
         EscalafonDocente        $escalafon,
         IdiomaDocente           $idioma,
         DocenteAniosExperiencia $aniosExperiencia,
-        string                  $areaTrabajo
+        string                  $areaTrabajo,
+        string                  $password = ''
     ): self {
         return new self(
             $id, $nombre, $apellidos, $email, $telefono,
             $blog, $profesional, $escalafon, $idioma,
-            $aniosExperiencia, $areaTrabajo
+            $aniosExperiencia, $areaTrabajo, $password
         );
     }
 
-    public function getId()                         { return $this->id; }
-    public function getNombre(): DocenteNombre      { return $this->nombre; }
-    public function getApellidos(): DocenteNombre   { return $this->apellidos; }
-    public function getEmail(): DocenteEmail        { return $this->email; }
-    public function getTelefono(): DocenteTelefono  { return $this->telefono; }
-    public function getBlog(): DocenteBlog          { return $this->blog; }
-    public function getProfesional(): string        { return $this->profesional; }
-    public function getEscalafon(): EscalafonDocente{ return $this->escalafon; }
-    public function getIdioma(): IdiomaDocente      { return $this->idioma; }
+    public function getId()                                      { return $this->id; }
+    public function getNombre(): DocenteNombre                   { return $this->nombre; }
+    public function getApellidos(): DocenteNombre                { return $this->apellidos; }
+    public function getEmail(): DocenteEmail                     { return $this->email; }
+    public function getTelefono(): DocenteTelefono               { return $this->telefono; }
+    public function getBlog(): DocenteBlog                       { return $this->blog; }
+    public function getProfesional(): string                     { return $this->profesional; }
+    public function getEscalafon(): EscalafonDocente             { return $this->escalafon; }
+    public function getIdioma(): IdiomaDocente                   { return $this->idioma; }
     public function getAniosExperiencia(): DocenteAniosExperiencia { return $this->aniosExperiencia; }
-    public function getAreaTrabajo(): string        { return $this->areaTrabajo; }
+    public function getAreaTrabajo(): string                     { return $this->areaTrabajo; }
+    public function getPassword(): string                        { return $this->password; }
 
     public function getNombreCompleto(): string
     {

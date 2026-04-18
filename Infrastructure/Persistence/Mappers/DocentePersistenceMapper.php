@@ -27,7 +27,8 @@ class DocentePersistenceMapper
             EscalafonDocente::from($row['escalafon']),
             IdiomaDocente::from($row['idioma']),
             DocenteAniosExperiencia::from((int) $row['anios_experiencia']),
-            $row['area_trabajo']
+            $row['area_trabajo'],
+            $row['password'] ?? ''
         );
     }
 

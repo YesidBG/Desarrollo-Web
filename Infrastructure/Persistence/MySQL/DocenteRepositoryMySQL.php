@@ -8,6 +8,7 @@ use Application\Ports\Out\GetDocenteByEmailPort;
 use Application\Ports\Out\GetAllDocentesPort;
 use Application\Ports\Out\UpdateDocentePort;
 use Application\Ports\Out\DeleteDocentePort;
+use Application\Ports\Out\UpdatePasswordPort;
 use Domain\Models\DocenteModel;
 use Domain\ValueObjects\DocenteId;
 use Domain\ValueObjects\DocenteEmail;
@@ -19,7 +20,8 @@ class DocenteRepositoryMySQL implements
     GetDocenteByEmailPort,
     GetAllDocentesPort,
     UpdateDocentePort,
-    DeleteDocentePort
+    DeleteDocentePort,
+    UpdatePasswordPort
 {
     private $pdo;
     private $mapper;
@@ -34,12 +36,13 @@ class DocenteRepositoryMySQL implements
     {
         $sql = "INSERT INTO docentes
                     (nombre, apellidos, email, telefono, blog, profesional,
-                     escalafon, idioma, anios_experiencia, area_trabajo)
+                     escalafon, idioma, anios_experiencia, area_trabajo, password)
                 VALUES
                     (:nombre, :apellidos, :email, :telefono, :blog, :profesional,
-                     :escalafon, :idioma, :anios_experiencia, :area_trabajo)";
+                     :escalafon, :idioma, :anios_experiencia, :area_trabajo, :password)";
         $stmt   = $this->pdo->prepare($sql);
         $entity = $this->mapper->modelToEntity($docente);
+        $entity[':password'] = $docente->getPassword();
         $stmt->execute($entity);
         $newId = (int) $this->pdo->lastInsertId();
         return $this->find(DocenteId::from($newId));
@@ -95,5 +98,13 @@ class DocenteRepositoryMySQL implements
     {
         $stmt = $this->pdo->prepare("DELETE FROM docentes WHERE id = :id");
         $stmt->execute(array(':id' => $id->value()));
+    }
+
+    public function updatePassword(DocenteId $id, string $hashedPassword): void
+    {
+        $stmt = $this->pdo->prepare(
+            "UPDATE docentes SET password = :password WHERE id = :id"
+        );
+        $stmt->execute(array(':password' => $hashedPassword, ':id' => $id->value()));
     }
 }

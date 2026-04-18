@@ -205,6 +205,12 @@
 
 <nav class="navbar">
     <a href="index.php?route=home" class="navbar-brand">
+        <?php if (isset($_SESSION['auth'])): ?>
+    <span style="color:#94a3b8;font-size:.85rem;padding:.4rem .5rem;">
+        👤 <?= htmlspecialchars($_SESSION['auth']['nombre']) ?>
+    </span>
+    <a href="index.php?route=auth.logout" class="nav-link" style="color:#ef4444;">Salir</a>
+<?php endif; ?>
         🎓 <span>CRUD</span> Docentes
     </a>
     <div class="navbar-nav">

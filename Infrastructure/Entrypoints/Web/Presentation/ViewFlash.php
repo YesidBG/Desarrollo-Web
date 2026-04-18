@@ -12,23 +12,23 @@ class View
     }
 
     public static function render(string $template, array $data = []): void
-    {
-        $file = self::$basePath
-              . DIRECTORY_SEPARATOR . 'Infrastructure'
-              . DIRECTORY_SEPARATOR . 'Entrypoints'
-              . DIRECTORY_SEPARATOR . 'Web'
-              . DIRECTORY_SEPARATOR . 'Presentation'
-              . DIRECTORY_SEPARATOR . 'Views'
-              . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $template)
-              . '.php';
+{
+    $file = self::$basePath
+          . DIRECTORY_SEPARATOR . 'Infrastructure'
+          . DIRECTORY_SEPARATOR . 'Entrypoints'
+          . DIRECTORY_SEPARATOR . 'Web'
+          . DIRECTORY_SEPARATOR . 'Presentation'
+          . DIRECTORY_SEPARATOR . 'Views'
+          . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $template)
+          . '.php';
 
-        if (!file_exists($file)) {
-            throw new \RuntimeException("Vista no encontrada: " . $file);
-        }
-
-        extract($data, EXTR_SKIP);
-        require $file;
+    if (!file_exists($file)) {
+        throw new \RuntimeException("Vista no encontrada: " . $file);
     }
+
+    extract($data, EXTR_SKIP);
+    require $file;
+}
 
     public static function redirect(string $route, array $params = []): void
     {
