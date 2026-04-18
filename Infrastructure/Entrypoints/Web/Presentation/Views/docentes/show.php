@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Detalle Docente';
-require __DIR__ . '/../layouts/header.php';
+require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'layouts' . DIRECTORY_SEPARATOR . 'header.php';
 ?>
 
 <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;">
@@ -83,4 +83,4 @@ require __DIR__ . '/../layouts/header.php';
 
 </div>
 
-<?php require __DIR__ . '/../layouts/footer.php'; ?>
+<?php require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'layouts' . DIRECTORY_SEPARATOR . 'footer.php'; ?>

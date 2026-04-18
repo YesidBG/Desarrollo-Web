@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Nuevo Docente';
-require __DIR__ . '/../layouts/header.php';
+require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'layouts' . DIRECTORY_SEPARATOR . 'header.php';
 
 use Infrastructure\Entrypoints\Web\Presentation\Flash;
 ?>
@@ -101,4 +101,4 @@ use Infrastructure\Entrypoints\Web\Presentation\Flash;
     </div>
 </div>
 
-<?php require __DIR__ . '/../layouts/footer.php'; ?>
+<?php require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'layouts' . DIRECTORY_SEPARATOR . 'footer.php'; ?>
